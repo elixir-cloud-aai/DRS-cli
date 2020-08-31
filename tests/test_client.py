@@ -1,10 +1,11 @@
-from drs_client.client import DRSClient
-import requests
+"""Unit tests for DRS client."""
+
 import requests_mock
 import unittest
 import uuid
 import json
 
+from drs_cli.client import DRSClient
 
 OBJECT_JSON_POST_DATA = {
     "created_time": "2019-05-20T00:12:34-07:00",
@@ -22,7 +23,7 @@ OBJECT_JSON_POST_DATA = {
         {
             "type": "ftp",
             "access_url": {
-                "url": "drs://ftp.ensembl.org/pub/release-81/bed/ensembl-compara/11_teleost_fish.gerp_constrained_eleme",
+                "url": "ftp://my.ftp.service/my_path/my_file_01.txt",
                 "headers":  [
                     "None"
                 ]
@@ -49,7 +50,7 @@ OBJECT_JSON_GET_DATA = {
         {
             "type": "ftp",
             "access_url": {
-                "url": "drs://ftp.ensembl.org/pub/release-81/bed/ensembl-compara/11_teleost_fish.gerp_constrained_eleme",
+                "url": "ftp://my.ftp.service/my_path/my_file_01.txt",
                 "headers":  [
                     "None"
                 ]
@@ -60,7 +61,7 @@ OBJECT_JSON_GET_DATA = {
 }
 
 ACCESS_URL_GET_DATA = {
-    "url": "drs://ftp.ensembl.org/pub/release-81/bed/ensembl-compara/11_teleost_fish.gerp_constrained_eleme",
+    "url": "ftp://my.ftp.service/my_path/my_file_01.txt",
     "headers":  [
         "None"
     ]
@@ -85,7 +86,6 @@ class TestDRSClient(unittest.TestCase):
         cli = DRSClient(host="http://0.0.0.0", port="80", base_path="a/b/c")
         self.assertEqual(cli.url, "http://0.0.0.0:80/a/b/c")
 
-
     def test_get_object(self):
         """Test get_object url"""
         with requests_mock.Mocker() as m:
@@ -97,17 +97,20 @@ class TestDRSClient(unittest.TestCase):
             )
             self.cli.get_object("abc")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}")
-            
+                m.last_request.url,
+                f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}",
+            )
+
             m.get(
                 f"{self.cli.url}/objects/{mock_id}",
                 status_code=404,
-                json = MOCK_ERROR
+                json=MOCK_ERROR,
             )
             self.cli.get_object("abc")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}")
-
+                m.last_request.url,
+                f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}",
+            )
 
     def test_get_object_token(self):
         """Test get_object url with token"""
@@ -121,8 +124,9 @@ class TestDRSClient(unittest.TestCase):
             )
             cli.get_object("abc")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}")
-    
+                m.last_request.url,
+                f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}",
+            )
 
     def test_get_access_url(self):
         """Test get_access_url url"""
@@ -136,7 +140,12 @@ class TestDRSClient(unittest.TestCase):
             )
             self.cli.get_access_url("abc", "def")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}/access/{mock_access_id}")
+                m.last_request.url,
+                (
+                    f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}/"
+                    f"access/{mock_access_id}"
+                ),
+            )
 
             m.get(
                 f"{self.cli.url}/objects/{mock_id}/access/{mock_access_id}",
@@ -145,8 +154,12 @@ class TestDRSClient(unittest.TestCase):
             )
             self.cli.get_access_url("abc", "def")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}/access/{mock_access_id}")
-
+                m.last_request.url,
+                (
+                    f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}/"
+                    f"access/{mock_access_id}"
+                ),
+            )
 
     def test_get_access_url_token(self):
         """Test get_access_url url with token"""
@@ -161,8 +174,12 @@ class TestDRSClient(unittest.TestCase):
             )
             cli.get_access_url("abc", "def")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}/access/{mock_access_id}")
-
+                m.last_request.url,
+                (
+                    f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}/"
+                    f"access/{mock_access_id}"
+                ),
+            )
 
     def test_post_object(self):
         """Test post_object url"""
@@ -175,7 +192,10 @@ class TestDRSClient(unittest.TestCase):
             json_string = json.dumps(OBJECT_JSON_POST_DATA)
             json_data = json.loads(json_string)
             self.cli.post_object(json_data)
-            self.assertEqual(m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects")
+            self.assertEqual(
+                m.last_request.url,
+                "http://fakehost:8080/ga4gh/drs/v1/objects",
+            )
 
             m.post(
                 f"{self.cli.url}/objects",
@@ -185,8 +205,10 @@ class TestDRSClient(unittest.TestCase):
             json_string = json.dumps(OBJECT_JSON_POST_DATA)
             json_data = json.loads(json_string)
             self.cli.post_object(json_data)
-            self.assertEqual(m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects")
-
+            self.assertEqual(
+                m.last_request.url,
+                "http://fakehost:8080/ga4gh/drs/v1/objects",
+            )
 
     def test_post_object_token(self):
         """Test post_object url with token"""
@@ -200,8 +222,10 @@ class TestDRSClient(unittest.TestCase):
             json_string = json.dumps(OBJECT_JSON_POST_DATA)
             json_data = json.loads(json_string)
             cli.post_object(json_data)
-            self.assertEqual(m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects")
-
+            self.assertEqual(
+                m.last_request.url,
+                "http://fakehost:8080/ga4gh/drs/v1/objects",
+            )
 
     def test_delete_object(self):
         """Test delete_object url"""
@@ -214,7 +238,9 @@ class TestDRSClient(unittest.TestCase):
             )
             self.cli.delete_object("abc")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}")
+                m.last_request.url,
+                f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}",
+            )
 
             m.delete(
                 f"{self.cli.url}/objects/{mock_id}",
@@ -223,8 +249,9 @@ class TestDRSClient(unittest.TestCase):
             )
             self.cli.delete_object("abc")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}")
-
+                m.last_request.url,
+                f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}",
+            )
 
     def test_delete_object_token(self):
         """Test delete_object url with token"""
@@ -238,4 +265,6 @@ class TestDRSClient(unittest.TestCase):
             )
             cli.delete_object("abc")
             self.assertEqual(
-                m.last_request.url, f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}")
+                m.last_request.url,
+                f"http://fakehost:8080/ga4gh/drs/v1/objects/{mock_id}",
+            )

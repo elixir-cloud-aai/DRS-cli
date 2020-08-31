@@ -1,50 +1,88 @@
 # DRS-cli
 
-[![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg?style=flat&color=important)](http://www.apache.org/licenses/LICENSE-2.0)
-![GitHub: latest tag](https://flat.badgen.net/github/tag/elixir-cloud-aai/DRS-cli?color=cyan&icon=github)
+[![License][badge-license]][badge-url-license]
+[![Build_status][badge-build-status]][badge-url-build-status]
+[![Coverage][badge-coverage]][badge-url-coverage]
+[![GitHub_tag][badge-github-tag]][badge-url-github-tag]
+[![PyPI_release][badge-pypi]][badge-url-pypi]
 
-This repository contains a client for an implementation of the 
-[Data Repository Service] API schema of the [Global Alliance for Genomics
-and Health], as described in the [drs-filer] repository.
+This repository contains a client for an implementation of the [Data Repository
+Service][res-ga4gh-drs] API schema of the [Global Alliance for Genomics and
+Health][res-ga4gh], including support for additional endpoints defined in
+[ELIXIR Cloud & AAI's][res-elixir-cloud]
+[DRS-Filer][res-elixir-cloud-drs-filer] DRS implementation.
 
 ## Usage
 
 To use the client import it as follows in your Python code after
 [installation](#Installation):
 
-```py
-import drs_client
+### Create client instance
 
-client = drs_client.client.DRSClient(
-        host = "my-drs.app", 
-        port = "80", 
-        base_path = "ga4gh/drs/v1"
-        )
+```py
+from drs_cli.client import DRSClient
+
+client = DRSClient(
+    host="my-drs.app",
+    port="80",
+    base_path="ga4gh/drs/v1",
+)
 ```
 
 It is possible to supply a Bearer token, which will then be added to the
 `Authentication` header (prepended by `Bearer`) for every outbound call:
 
 ```py
-import drs_client
+from drs_cli.client import DRSClient
 
-client = drs_client.client.DRSClient(
-        host = "https://my-drs.app", 
-        port = "80", 
-        base_path = "ga4gh/drs/v1"
-        token = "<some_token>"
-        )
+client = DRSClient(
+    host="https://my-drs.app",
+    port="80",
+    base_path="ga4gh/drs/v1",
+    token = "<some_token>",
+)
 ```
 
-The DRS `GET /objects/{object_id}` endpoint can then accessed with, e.g.,:
+### Access endpoints
+
+> **NOTES:**
+>  
+> * All endpoint access methods accept an optional `token` argument that
+>   allows overwriting any token supplied when creating the client instance.
+> * Responses that do not return the object ID as a single string return
+>   [Pydantic][res-pydantic] models instead. If dictionaries are preferred
+>   instead, they can be obtained with `response.dict()`. See the [Pydantic
+>   export documentation][res-pydantic-docs-export] for further details.
+
+#### `GET` endpoints
+
+The [DRS][res-ga4gh-drs] `GET /objects/{object_id}` endpoint can then be
+accessed with, e.g.:
 
 ```py
-response = client.get_object("a001")
+response = client.get_object(
+    object_id="A3SF4B",
+)
 ```
-The DRS `POST /objects` endpoint can be access with, e.g.:
+
+Similarly, the [DRS][res-ga4gh-drs] `GET
+/objects/{object_id}/access/{access_id}` endpoint can be accessed with, e.g.:
 
 ```py
-response = client.post_object(object_data={
+response = client.get_access_url(
+    object_id="A3SF4B",
+    access_id="B44FG9",
+)
+```
+
+#### `POST` endpoint
+
+The [DRS-Filer][res-elixir-cloud-drs-filer] `POST /objects` endpoint can be
+accessed with, e.g.:
+
+```py
+response = client.post_object(
+    object_data={
         "created_time": "2019-05-20T00:12:34-07:00",
         "updated_time": "2019-04-24T05:23:43-06:00",
         "version": "1",
@@ -70,6 +108,17 @@ response = client.post_object(object_data={
     })
 ```
 
+#### `DELETE` endpoint
+
+The [DRS-Filer][res-elixir-cloud-drs-filer] `DELETE /objects/{object_id}`
+endpoint can be accessed with, e.g.:
+
+```py
+response = client.get_object(
+    object_id="A3SF4B",
+)
+```
+
 ## Installation
 
 You can install `DRS-cli` in one of two ways:
@@ -77,13 +126,10 @@ You can install `DRS-cli` in one of two ways:
 ### Installation via package manager
 
 ```bash
-pip install drs_client
-```
+pip install drs_cli
 
-or (for development version)
-
-```bash
-pip install -e git+https://github.com/elixir-cloud-aai/DRS-cli.git#egg=drs_client
+# Or for latest development version:
+pip install -e git+https://github.com/elixir-cloud-aai/DRS-cli.git#egg=drs_cli
 ```
 
 ### Manual installation
@@ -117,18 +163,31 @@ This project is covered by the [Apache License 2.0][license-apache] also
 ## Contact
 
 The project is a collaborative effort under the umbrella of [ELIXIR Cloud &
-AAI][org-elixir-cloud]. Follow the link to get in touch with us via chat or
+AAI][res-elixir-cloud]. Follow the link to get in touch with us via chat or
 email. Please mention the name of this service for any inquiry, proposal,
 question etc.
 
-![logo banner]
+![logo_banner][]
 
+[badge-build-status]:<https://travis-ci.com/elixir-cloud-aai/DRS-cli.svg?branch=dev>
+[badge-coverage]:<https://img.shields.io/coveralls/github/elixir-cloud-aai/DRS-cli>
+[badge-github-tag]:<https://img.shields.io/github/v/tag/elixir-cloud-aai/DRS-cli?color=C39BD3>
+[badge-license]:<https://img.shields.io/badge/license-Apache%202.0-blue.svg>
+[badge-pypi]:<https://img.shields.io/pypi/v/drs_cli.svg?style=flat&color=C39BD3>
+[badge-url-build-status]:<https://travis-ci.com/elixir-cloud-aai/DRS-cli>
+[badge-url-coverage]:<https://coveralls.io/github/elixir-cloud-aai/DRS-cli>
+[badge-url-github-tag]:<https://github.com/elixir-cloud-aai/DRS-cli/releases>
+[badge-url-license]:<http://www.apache.org/licenses/LICENSE-2.0>
+[badge-url-pypi]:<https://pypi.python.org/pypi/drs_cli>
 [license]: LICENSE
 [license-apache]: <https://www.apache.org/licenses/LICENSE-2.0>
-[org-elixir-cloud]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai>
-[res-elixir-cloud-contributing]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai/blob/dev/CONTRIBUTING.md>
-[drs-filer]: <https://github.com/elixir-cloud-aai/drs-filer>
-[Data Repository Service]: <https://github.com/ga4gh/data-repository-service-schemas>
-[res-semver]: <https://semver.org/>
-[res-elixir-cloud-contributing]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai/blob/dev/CONTRIBUTING.md>
+[logo_banner]: images/logo-banner.png
+[res-elixir-cloud]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai>
 [res-elixir-cloud-coc]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai/blob/dev/CODE_OF_CONDUCT.md>
+[res-elixir-cloud-contributing]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai/blob/dev/CONTRIBUTING.md>
+[res-elixir-cloud-drs-filer]: <https://github.com/elixir-cloud-aai/drs-filer>
+[res-ga4gh-drs]: <https://github.com/ga4gh/data-repository-service-schemas>
+[res-ga4gh]: <https://www.ga4gh.org/>
+[res-pydantic]: <https://pydantic-docs.helpmanual.io/>
+[res-pydantic-docs-export]: <https://pydantic-docs.helpmanual.io/usage/exporting_models/>
+[res-semver]: <https://semver.org/>

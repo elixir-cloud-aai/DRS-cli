@@ -6,7 +6,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='drs_client',
+    name='drs_cli',
     version=__version__,
     author='ELIXIR Cloud & AAI',
     author_email='sarthakgupta072@gmail.com',
