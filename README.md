@@ -23,8 +23,8 @@ To use the client import it as follows in your Python code after
 from drs_cli.client import DRSClient
 
 client = DRSClient(
-    host="my-drs.app",
-    port="80",
+    host="https://my-drs.app",
+    port=80,
     base_path="ga4gh/drs/v1",
 )
 ```
@@ -37,7 +37,7 @@ from drs_cli.client import DRSClient
 
 client = DRSClient(
     host="https://my-drs.app",
-    port="80",
+    port=80,
     base_path="ga4gh/drs/v1",
     token = "<some_token>",
 )
@@ -98,14 +98,15 @@ response = client.post_object(
             {
             "type": "ftp",
             "access_url": {
-                "url": "drs://ftp.ensembl.org/pub/release-81/bed/ensembl-compara/11_teleost_fish.gerp_constrained_eleme",
+                "url": "ftp://my.ftp.server/my_path/my_file_01.txt",
                 "headers":  [
                 "None"
                 ]
             }
             }
         ]
-    })
+    }
+)
 ```
 
 #### `DELETE` endpoint
