@@ -114,7 +114,7 @@ The [DRS-Filer][res-elixir-cloud-drs-filer] `DELETE /objects/{object_id}`
 endpoint can be accessed with, e.g.:
 
 ```py
-response = client.get_object(
+response = client.delete_object(
     object_id="A3SF4B",
 )
 ```
