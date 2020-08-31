@@ -119,6 +119,10 @@ response = client.get_object(
 )
 ```
 
+## API docs
+
+Automatically built [API documentation][docs-api] is available.
+
 ## Installation
 
 You can install `DRS-cli` in one of two ways:
@@ -179,6 +183,7 @@ question etc.
 [badge-url-github-tag]:<https://github.com/elixir-cloud-aai/DRS-cli/releases>
 [badge-url-license]:<http://www.apache.org/licenses/LICENSE-2.0>
 [badge-url-pypi]:<https://pypi.python.org/pypi/drs_cli>
+[docs-api]: <https://drs-cli.readthedocs.io/en/latest/>
 [license]: LICENSE
 [license-apache]: <https://www.apache.org/licenses/LICENSE-2.0>
 [logo_banner]: images/logo-banner.png
