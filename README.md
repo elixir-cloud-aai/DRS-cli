@@ -178,12 +178,12 @@ question etc.
 [badge-coverage]:<https://img.shields.io/coveralls/github/elixir-cloud-aai/DRS-cli>
 [badge-github-tag]:<https://img.shields.io/github/v/tag/elixir-cloud-aai/DRS-cli?color=C39BD3>
 [badge-license]:<https://img.shields.io/badge/license-Apache%202.0-blue.svg>
-[badge-pypi]:<https://img.shields.io/pypi/v/drs_cli.svg?style=flat&color=C39BD3>
+[badge-pypi]:<https://img.shields.io/pypi/v/drs-cli.svg?style=flat&color=C39BD3>
 [badge-url-build-status]:<https://travis-ci.com/elixir-cloud-aai/DRS-cli>
 [badge-url-coverage]:<https://coveralls.io/github/elixir-cloud-aai/DRS-cli>
 [badge-url-github-tag]:<https://github.com/elixir-cloud-aai/DRS-cli/releases>
 [badge-url-license]:<http://www.apache.org/licenses/LICENSE-2.0>
-[badge-url-pypi]:<https://pypi.python.org/pypi/drs_cli>
+[badge-url-pypi]:<https://pypi.python.org/pypi/drs-cli>
 [docs-api]: <https://drs-cli.readthedocs.io/en/latest/>
 [license]: LICENSE
 [license-apache]: <https://www.apache.org/licenses/LICENSE-2.0>
