@@ -56,6 +56,7 @@ MOCK_ERROR = {
     "status_code": "400"
 }
 
+
 class TestDRSClient(unittest.TestCase):
 
     cli = DRSClient(
