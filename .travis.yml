@@ -10,5 +10,6 @@ python:
 if: (type == push) OR (type == pull_request AND fork == true)
 
 script:
-  - coverage run -m pytest
+  - flake8
+  - coverage run --source drs_cli -m pytest; coverage report -m
   - coveralls

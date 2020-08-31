@@ -137,10 +137,10 @@ class DRSClient():
             self.token = token
             self._get_headers()
         # validate outgoing payload
-        data = PostDrsObject(**object_data).dict()
+        PostDrsObject(**object_data).dict()
         response = requests.post(
             url=request_url,
-            json=data,
+            json=object_data,
             headers=self.headers,
         )
         if response.status_code == 200:

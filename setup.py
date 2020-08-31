@@ -1,6 +1,6 @@
 from setuptools import (setup, find_packages)
 
-from drs_client import __version__
+from drs_cli import __version__
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
