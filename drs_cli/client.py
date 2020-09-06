@@ -2,12 +2,15 @@
 
 import logging
 import requests
-from typing import (Dict, Optional, Union)
+import re
+from typing import (Dict, Optional, Tuple, Union)
 
 from drs_cli.models import (AccessURL, DrsObject, Error, PostDrsObject)
+from drs_cli.errors import DRS_URI_FORMAT_ERROR
 
 logger = logging.getLogger(__name__)
 
+DRS_URI_PATTERN = r'^drs:\/\/([A-Za-z0-9.]+)\/([A-Za-z0-9.-_~]+$)'
 
 class DRSClient():
     """Client to communicate with a GA4GH DRS instance.
@@ -30,18 +33,20 @@ class DRSClient():
     def __init__(
         self,
         host: str = 'http://0.0.0.0',
-        port: int = '8080',
+        port: int = 80,
         base_path: str = 'ga4gh/drs/v1',
         token: Optional[str] = None,
     ) -> None:
         self.url = f"{host}:{port}/{base_path}"
+        self.base_path = base_path
         self.token = token
         self._get_headers()
         logger.info(f"API URL: {self.url}")
 
     def get_object(
         self,
-        object_id: str,
+        object_id: Optional[str] = None,
+        drs_uri: Optional[str] = None,
         token: Optional[str] = None,
     ) -> Union[Error, DrsObject]:
         """Access DRS object.
@@ -59,7 +64,18 @@ class DRSClient():
             pydantic.ValidationError: The returned response does not conform
                 to the models defined in the API specification.
         """
+        
+        if drs_uri:
+            if _check_drs_regex(drs_uri):
+                host_and_id = _get_host_and_id(drs_uri)
+                object_id = host_and_id[1]
+                self.url = f"http://{host_and_id[0]}/{self.base_path}"
+            else:
+                return Error(**DRS_URI_FORMAT_ERROR)
+        
         request_url = f"{self.url}/objects/{object_id}"
+        # print(request_url)
+        logger.info(f"Request URL: {request_url}")      
         if token:
             self.token = token
             self._get_headers()
@@ -193,3 +209,15 @@ class DRSClient():
         }
         if self.token:
             self.headers['Authorization'] = 'Bearer ' + self.token
+
+
+def _check_drs_regex(uri) -> bool:
+    isMatch = re.fullmatch(DRS_URI_PATTERN, uri)
+    if isMatch:
+        return True
+    else:
+        return False
+
+def _get_host_and_id(uri) -> Tuple:
+    searchObj = re.search( DRS_URI_PATTERN, uri, re.M|re.I)
+    return (searchObj.group(1), searchObj.group(2))
