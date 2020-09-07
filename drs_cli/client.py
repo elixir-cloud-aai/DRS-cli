@@ -35,10 +35,17 @@ class DRSClient():
         host: str = 'http://0.0.0.0',
         port: int = 80,
         base_path: str = 'ga4gh/drs/v1',
+        drs_uri: Optional[str] = None,
         token: Optional[str] = None,
-    ) -> None:
+    ) -> Union[None, Error]:
+        
         self.url = f"{host}:{port}/{base_path}"
-        self.base_path = base_path
+        if drs_uri:
+            if _check_drs_regex(drs_uri):
+                drs_host = _get_host_and_id(drs_uri)[0]
+                self.url = f"http://{drs_host}/{base_path}"
+            else:
+                return Error(**DRS_URI_FORMAT_ERROR)
         self.token = token
         self._get_headers()
         logger.info(f"API URL: {self.url}")
@@ -67,12 +74,9 @@ class DRSClient():
         
         if drs_uri:
             if _check_drs_regex(drs_uri):
-                host_and_id = _get_host_and_id(drs_uri)
-                object_id = host_and_id[1]
-                self.url = f"http://{host_and_id[0]}/{self.base_path}"
+                object_id = _get_host_and_id(drs_uri)[1]
             else:
                 return Error(**DRS_URI_FORMAT_ERROR)
-        
         request_url = f"{self.url}/objects/{object_id}"
         # print(request_url)
         logger.info(f"Request URL: {request_url}")      
