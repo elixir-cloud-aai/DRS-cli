@@ -4,7 +4,7 @@ from typing import Tuple, Optional
 DRS_URI_PATTERN = r'^drs:\/\/([A-Za-z0-9.]+)\/([A-Za-z0-9.-_~]+$)'
 HTTP_URI_PATTERN = r'^http:\/\/([A-Za-z0-9.]+$)'
 HTTPS_URI_PATTERN = r'^https:\/\/([A-Za-z0-9.]+$)'
-DRS_ID_PATTERN = r'[A-Za-z0-9.-_~]'
+DRS_ID_PATTERN = r'[A-Za-z0-9._~-]+$'
 
 def check_drs_uri_regex(uri) -> bool:
     """Check regular expression for DRS URI"""
