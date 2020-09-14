@@ -9,7 +9,7 @@ from drs_cli.client import DRSClient
 
 MOCK_ID = str(uuid.uuid4())
 MOCK_ACCESS_ID = str(uuid.uuid4())
-MOCK_HOST = "http://fakehost"
+MOCK_HOST = "http://fakehost.com"
 MOCK_PORT = 8080
 MOCK_BASE_PATH = "a/b/c"
 MOCK_TOKEN = "MyT0k3n"
@@ -60,11 +60,11 @@ MOCK_ERROR = {
 class TestDRSClient(unittest.TestCase):
 
     cli = DRSClient(
-        host=MOCK_HOST,
+        uri=MOCK_HOST,
         port=MOCK_PORT,
     )
     cli_t = DRSClient(
-        host=MOCK_HOST,
+        uri=MOCK_HOST,
         port=MOCK_PORT,
         token=MOCK_TOKEN,
     )
@@ -72,12 +72,12 @@ class TestDRSClient(unittest.TestCase):
     def test_cli(self):
         """Test url attribute"""
         cli = DRSClient(
-            host=MOCK_HOST,
+            uri=MOCK_HOST,
             port=MOCK_PORT,
             base_path=MOCK_BASE_PATH,
         )
         self.assertEqual(
-            cli.url,
+            cli.uri,
             f"{MOCK_HOST}:{MOCK_PORT}/{MOCK_BASE_PATH}",
         )
 
@@ -85,7 +85,7 @@ class TestDRSClient(unittest.TestCase):
         """Test get_object url"""
         with requests_mock.Mocker() as m:
             m.get(
-                f"{self.cli.url}/objects/{MOCK_ID}",
+                f"{self.cli.uri}/objects/{MOCK_ID}",
                 status_code=200,
                 json=OBJECT_JSON_GET_DATA,
             )
@@ -96,7 +96,7 @@ class TestDRSClient(unittest.TestCase):
             )
 
             m.get(
-                f"{self.cli.url}/objects/{MOCK_ID}",
+                f"{self.cli.uri}/objects/{MOCK_ID}",
                 status_code=404,
                 json=MOCK_ERROR,
             )
@@ -110,7 +110,7 @@ class TestDRSClient(unittest.TestCase):
         """Test get_object url with token"""
         with requests_mock.Mocker() as m:
             m.get(
-                f"{self.cli_t.url}/objects/{MOCK_ID}",
+                f"{self.cli_t.uri}/objects/{MOCK_ID}",
                 status_code=200,
                 json=OBJECT_JSON_GET_DATA,
             )
@@ -127,7 +127,7 @@ class TestDRSClient(unittest.TestCase):
         """Test get_access_url"""
         with requests_mock.Mocker() as m:
             m.get(
-                f"{self.cli.url}/objects/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
+                f"{self.cli.uri}/objects/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
                 status_code=200,
                 json=ACCESS_URL_GET_DATA,
             )
@@ -140,7 +140,7 @@ class TestDRSClient(unittest.TestCase):
                 f"{MOCK_DRS_URL}/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
             )
             m.get(
-                f"{self.cli.url}/objects/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
+                f"{self.cli.uri}/objects/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
                 status_code=404,
                 json=MOCK_ERROR,
             )
@@ -157,7 +157,7 @@ class TestDRSClient(unittest.TestCase):
         """Test get_access_url url with token"""
         with requests_mock.Mocker() as m:
             m.get(
-                f"{self.cli_t.url}/objects/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
+                f"{self.cli_t.uri}/objects/{MOCK_ID}/access/{MOCK_ACCESS_ID}",
                 status_code=200,
                 json=ACCESS_URL_GET_DATA,
             )
@@ -175,7 +175,7 @@ class TestDRSClient(unittest.TestCase):
         """Test post_object url"""
         with requests_mock.Mocker() as m:
             m.post(
-                f"{self.cli.url}/objects",
+                f"{self.cli.uri}/objects",
                 status_code=200,
                 json=MOCK_ID,
             )
@@ -187,7 +187,7 @@ class TestDRSClient(unittest.TestCase):
                 f"{MOCK_DRS_URL}",
             )
             m.post(
-                f"{self.cli.url}/objects",
+                f"{self.cli.uri}/objects",
                 status_code=400,
                 json=MOCK_ERROR,
             )
@@ -203,7 +203,7 @@ class TestDRSClient(unittest.TestCase):
         """Test post_object url with token"""
         with requests_mock.Mocker() as m:
             m.post(
-                f"{self.cli_t.url}/objects",
+                f"{self.cli_t.uri}/objects",
                 status_code=200,
                 json=MOCK_ID,
             )
@@ -222,7 +222,7 @@ class TestDRSClient(unittest.TestCase):
         """Test delete_object url"""
         with requests_mock.Mocker() as m:
             m.delete(
-                f"{self.cli.url}/objects/{MOCK_ID}",
+                f"{self.cli.uri}/objects/{MOCK_ID}",
                 status_code=200,
                 json=MOCK_ID,
             )
@@ -233,7 +233,7 @@ class TestDRSClient(unittest.TestCase):
             )
 
             m.delete(
-                f"{self.cli.url}/objects/{MOCK_ID}",
+                f"{self.cli.uri}/objects/{MOCK_ID}",
                 status_code=400,
                 json=MOCK_ERROR,
             )
@@ -247,7 +247,7 @@ class TestDRSClient(unittest.TestCase):
         """Test delete_object url with token"""
         with requests_mock.Mocker() as m:
             m.delete(
-                f"{self.cli_t.url}/objects/{MOCK_ID}",
+                f"{self.cli_t.uri}/objects/{MOCK_ID}",
                 status_code=200,
                 json=MOCK_ID,
             )
