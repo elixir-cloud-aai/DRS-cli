@@ -86,7 +86,7 @@ class DRSClient():
         self,
         object_id: str,
         token: Optional[str] = None,
-    ) -> Optional[Union[Error, DrsObject]]:
+    ) -> Union[Error, DrsObject]:
         """Retrieve DRS object.
 
         Arguments:
@@ -281,7 +281,7 @@ class DRSClient():
         else:
             try:
                 response_val = str(response.json())
-            except TypeError:
+            except json.decoder.JSONDecodeError:
                 raise InvalidResponseError(
                     "Response could not be validated against API schema."
                 )
@@ -346,7 +346,7 @@ class DRSClient():
         else:
             try:
                 response_val = str(response.json())
-            except TypeError:
+            except json.decoder.JSONDecodeError:
                 raise InvalidResponseError(
                     "Response could not be validated against API schema."
                 )
@@ -354,7 +354,11 @@ class DRSClient():
         return response_val
 
     def _get_headers(self) -> Dict:
-        """Build dictionary of request headers."""
+        """Build dictionary of request headers.
+
+        Returns:
+            A dictionary of request headers
+        """
         headers: Dict = {
             'Content-type': 'application/json',
         }
