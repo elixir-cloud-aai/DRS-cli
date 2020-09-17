@@ -17,10 +17,6 @@ def exception_handler(
     logger.error(msg)
 
 
-class InvalidObjectIdentifier(Exception):
-    """Exception raised for invalid object identifiers."""
-
-
 class InvalidObjectData(Exception):
     """Exception raised when object data cannot be validated against the API
     schema.

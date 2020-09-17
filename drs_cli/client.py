@@ -15,7 +15,6 @@ import pydantic
 from drs_cli.models import (AccessURL, DrsObject, Error, PostDrsObject)
 from drs_cli.errors import (
     InvalidObjectData, exception_handler,
-    InvalidObjectIdentifier,
     InvalidResponseError,
     InvalidURI,
 )
@@ -422,7 +421,4 @@ class DRSClient():
                 parsed.
         """
         match = re.search(self._RE_OBJECT_ID, object_id, re.I)
-        try:
-            return quote(string=match.group('obj_id'), safe='')
-        except Exception:
-            raise InvalidObjectIdentifier
+        return quote(string=match.group('obj_id'), safe='')
