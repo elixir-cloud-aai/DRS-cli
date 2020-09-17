@@ -6,11 +6,11 @@
 [![GitHub_tag][badge-github-tag]][badge-url-github-tag]
 [![PyPI_release][badge-pypi]][badge-url-pypi]
 
-This repository contains a client for an implementation of the [Data Repository
-Service][res-ga4gh-drs] API schema of the [Global Alliance for Genomics and
-Health][res-ga4gh], including support for additional endpoints defined in
-[ELIXIR Cloud & AAI's][res-elixir-cloud]
-[DRS-Filer][res-elixir-cloud-drs-filer] DRS implementation.
+Client for implementations of the [Global Alliance for Genomics and
+Health (GA4GH)][res-ga4gh] [Data Repository Service API][res-ga4gh-drs] schema,
+including support for additional endpoints defined in [ELIXIR Cloud &
+AAI's][res-elixir-cloud] generic [DRS-Filer][res-elixir-cloud-drs-filer] DRS
+implementation.
 
 ## Usage
 
@@ -19,36 +19,74 @@ To use the client import it as follows in your Python code after
 
 ### Create client instance
 
+#### Via DRS hostname
+
+A client instance can be created by specifying the domain name of a DRS
+instance, including the URL schema:
+
 ```py
 from drs_cli.client import DRSClient
 
-client = DRSClient(
-    host="https://my-drs.app",
-    port=80,
-    base_path="ga4gh/drs/v1",
-)
+client = DRSClient(uri="https://my-drs.app")
+# Client instantiated for URL: https://my-drs.app:443/ga4gh/drs/v1
 ```
 
-It is possible to supply a Bearer token, which will then be added to the
-`Authentication` header (prepended by `Bearer`) for every outbound call:
+Fully [spec-compliant][res-ga4gh-drs] DRS implementations will always be
+available at `https` URLs, served at port `443` and at the base path
+`ga4gh/drs/v1`. However, to allow the client to be used against development
+versions of DRS implementations, `http` URLs are supported as well (default
+port `80`), and the port and base path at which the API endpoints are served
+can be overridden with the `port` and `base_path` arguments:
 
 ```py
 from drs_cli.client import DRSClient
 
 client = DRSClient(
-    host="https://my-drs.app",
-    port=80,
-    base_path="ga4gh/drs/v1",
-    token = "<some_token>",
+    uri="http://my-drs.app",
+    port=8080,
+    base_path="my/api/route",
 )
+# Client instantiated for URL: http://my-drs.app:8080/my/api/route
+```
+
+#### Via DRS URI
+
+Clients can also be created by passing a [hostname-based DRS
+URI][res-ga4gh-drs-uri]:
+
+```py
+from drs_cli.client import DRSClient
+
+client = DRSClient(uri="drs://my-drs.app/SOME_OBJECT")
+# Client instantiated for URL: https://my-drs.app:443/ga4gh/drs/v1
+```
+
+> **NOTE:** Only the hostname part of the DRS URI is evaluated, not the object
+> ID.
+
+Port and base path can be overridden as described above. In addition, the
+client constructor also defines the `use_http` flag, which instantiates a
+client for an `http` URL when a DRS URI is passed. The flag has no effect
+when a DRS hostname URL is provided instead of a DRS URI:
+
+```py
+from drs_cli.client import DRSClient
+
+client = DRSClient(
+    uri="drs://my-drs.app/SOME_OBJECT",
+    use_http=True,
+)
+# Client instantiated for URL: http://my-drs.app:443/ga4gh/drs/v1
 ```
 
 ### Access endpoints
 
 > **NOTES:**
 >  
-> * All endpoint access methods accept an optional `token` argument that
->   allows overwriting any token supplied when creating the client instance.
+> * All endpoint access methods require a [client
+>   instance](#create-client-instance).
+> * For accessing endpoints that require authorization, see the
+>   [dedicated section](#authorization).
 > * Responses that do not return the object ID as a single string return
 >   [Pydantic][res-pydantic] models instead. If dictionaries are preferred
 >   instead, they can be obtained with `response.dict()`. See the [Pydantic
@@ -56,8 +94,8 @@ client = DRSClient(
 
 #### `GET` endpoints
 
-The [DRS][res-ga4gh-drs] `GET /objects/{object_id}` endpoint can then be
-accessed with, e.g.:
+The [DRS][res-ga4gh-drs] `GET /objects/{object_id}` endpoint can be accessed
+with, e.g.:
 
 ```py
 response = client.get_object(
@@ -120,6 +158,49 @@ response = client.delete_object(
 )
 ```
 
+### Authorization
+
+Authorization [bearer tokens][res-bearer-token] can be provided either during
+client instantiation or when calling an endpoint access method. The bearer
+token is sent along as an `Authorization` header with every request sent from
+the instantiated client instance.
+
+> **NOTE:** Whenever a token is specified when calling an API endpoint, the
+> `token` variable of that particular client instance is overridden. Thus,
+> subsequent calls from that client will all carry the new token value, unless
+> overridden again.
+
+The following example illustrates this behavior:
+
+```py
+from drs_cli.client import DRSClient
+
+# No token passed during client instantiation
+client = DRSClient(uri="https://my-drs.app")
+# Value of client.token: None
+
+# Token passed during API call
+client.get_object(
+    object_id="SOME_OBJECT",
+    token="N3wT0k3n",
+)
+# Value of client.token: N3wT0k3n
+
+# Token passed during client instantiation
+client_2 = DRSClient(
+    uri="https://my-drs.app",
+    token="MyT0k3n",
+)
+# Value of client_2.token: MyT0k3n
+
+# Token passed during API call
+client_2.get_object(
+    object_id="SOME_OBJECT",
+    token="N3wT0k3n",
+)
+# Value of client_2.token: N3wT0k3n
+```
+
 ## API docs
 
 Automatically built [API documentation][docs-api] is available.
@@ -134,7 +215,7 @@ You can install `DRS-cli` in one of two ways:
 pip install drs_cli
 
 # Or for latest development version:
-pip install -e git+https://github.com/elixir-cloud-aai/DRS-cli.git#egg=drs_cli
+pip install git+https://github.com/elixir-cloud-aai/DRS-cli.git#egg=drs_cli
 ```
 
 ### Manual installation
@@ -188,12 +269,14 @@ question etc.
 [license]: LICENSE
 [license-apache]: <https://www.apache.org/licenses/LICENSE-2.0>
 [logo_banner]: images/logo-banner.png
+[res-bearer-token]: <https://tools.ietf.org/html/rfc6750>
 [res-elixir-cloud]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai>
 [res-elixir-cloud-coc]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai/blob/dev/CODE_OF_CONDUCT.md>
 [res-elixir-cloud-contributing]: <https://github.com/elixir-cloud-aai/elixir-cloud-aai/blob/dev/CONTRIBUTING.md>
 [res-elixir-cloud-drs-filer]: <https://github.com/elixir-cloud-aai/drs-filer>
-[res-ga4gh-drs]: <https://github.com/ga4gh/data-repository-service-schemas>
 [res-ga4gh]: <https://www.ga4gh.org/>
+[res-ga4gh-drs]: <https://github.com/ga4gh/data-repository-service-schemas>
+[res-ga4gh-drs-uri]: <https://ga4gh.github.io/data-repository-service-schemas/preview/develop/docs/#_hostname_based_drs_uris>
 [res-pydantic]: <https://pydantic-docs.helpmanual.io/>
 [res-pydantic-docs-export]: <https://pydantic-docs.helpmanual.io/usage/exporting_models/>
 [res-semver]: <https://semver.org/>
