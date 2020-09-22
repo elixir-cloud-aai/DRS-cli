@@ -313,9 +313,7 @@ class DRSClient():
                 validated against the API schema.
         """
         obj_id = self._get_object_id(object_id=object_id)
-        print(obj_id)
         url = f"{self.uri}/objects/{obj_id}"
-        print(url)
         logger.info(f"Request URL: {url}")
         if token:
             self.token = token
