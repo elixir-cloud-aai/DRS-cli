@@ -56,7 +56,7 @@ class DRSClient():
         headers: Dictionary of request headers.
     """
     # set regular expressions as private class variables
-    _RE_DOMAIN_PART = r'[a-z0-9]([a-z0-9-]{1,61}[a-z0-9])?'
+    _RE_DOMAIN_PART = r'[a-z0-9]([a-z0-9-]{1,61}[a-z0-9]?)?'
     _RE_DOMAIN = rf"({_RE_DOMAIN_PART}\.)+{_RE_DOMAIN_PART}\.?"
     _RE_DRS_ID = r'.+'
     _RE_HOST = rf"^(?P<schema>drs|http|https):\/\/(?P<host>{_RE_DOMAIN})\/?"
