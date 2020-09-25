@@ -58,24 +58,25 @@ class DRSClient():
     # set regular expressions as private class variables
     _RE_DOMAIN_PART = r'[a-z0-9]([a-z0-9-]{1,61}[a-z0-9]?)?'
     _RE_DOMAIN = rf"({_RE_DOMAIN_PART}\.)+{_RE_DOMAIN_PART}\.?"
-    _RE_DRS_ID = r'.+'
+    _RE_DRS_ID = r'\S+'
     _RE_HOST = rf"^(?P<schema>drs|http|https):\/\/(?P<host>{_RE_DOMAIN})\/?"
     _RE_OBJECT_ID = rf"^(drs:\/\/{_RE_DOMAIN}\/)?(?P<obj_id>{_RE_DRS_ID})$"
 
     def __init__(
         self,
         uri: str,
-        port: int = None,
-        base_path: str = 'ga4gh/drs/v1',
+        port: Optional[int] = None,
+        base_path: Optional[str] = 'ga4gh/drs/v1',
         use_http: bool = False,
         token: Optional[str] = None,
-    ) -> Union[None, Error]:
+    ) -> None:
         """Class constructor."""
         schema, host = self._get_host(uri)
         if schema == 'drs':
             schema = 'http' if use_http else 'https'
         if port is None:
             port = 80 if schema == 'http' else 443
+        base_path = 'ga4gh/drs/v1' if base_path is None else base_path
         self.uri = f"{schema}://{host}:{port}/{base_path}"
         self.token = token
         self.headers = self._get_headers()
